@@ -16,7 +16,7 @@ FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
 # Copy the fat jar from the build stage
-COPY --from=build /app/target/intern-backend-0.0.1-SNAPSHOT.jar ./app.jar
+COPY --from=build /app/target/system/target/system-0.0.1-SNAPSHOT.jar ./app.jar
 
 # Expose the port the app is configured to use
 EXPOSE 8080
