@@ -9,6 +9,7 @@ import com.example.system.security.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -61,24 +62,27 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequest request) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-        );
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+            );
 
-        if (authentication.isAuthenticated()) {
-            User user = userRepository.findByEmail(request.getEmail()).get();
-            String token = jwtService.generateToken(user.getEmail());
-            return ResponseEntity.ok(new AuthResponse(
-                    token,
-                    user.getId(),
-                    user.getName(),
-                    user.getEmail(),
-                    user.getRole(),
-                    user.getDepartment(),
-                    user.getBranch()
-            ));
-        } else {
-            return ResponseEntity.badRequest().body("Invalid credentials");
+            if (authentication.isAuthenticated()) {
+                User user = userRepository.findByEmail(request.getEmail()).get();
+                String token = jwtService.generateToken(user.getEmail());
+                return ResponseEntity.ok(new AuthResponse(
+                        token,
+                        user.getId(),
+                        user.getName(),
+                        user.getEmail(),
+                        user.getRole(),
+                        user.getDepartment(),
+                        user.getBranch()
+                ));
+            }
+            return ResponseEntity.status(401).body("Invalid credentials");
+        } catch (AuthenticationException ex) {
+            return ResponseEntity.status(401).body("Invalid credentials");
         }
     }
 }
