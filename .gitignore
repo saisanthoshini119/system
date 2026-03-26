@@ -37,4 +37,4 @@ build/
 
 ### Local-only artifacts ###
 .m2/
-system/
+/system/
