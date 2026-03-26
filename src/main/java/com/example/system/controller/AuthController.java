@@ -69,7 +69,15 @@ public class AuthController {
         if (authentication.isAuthenticated()) {
             User user = userRepository.findByEmail(request.getEmail()).get();
             String token = jwtService.generateToken(user.getEmail());
-            return ResponseEntity.ok(new AuthResponse(token, user.getName(), user.getEmail(), user.getRole(), user.getDepartment()));
+            return ResponseEntity.ok(new AuthResponse(
+                    token,
+                    user.getId(),
+                    user.getName(),
+                    user.getEmail(),
+                    user.getRole(),
+                    user.getDepartment(),
+                    user.getBranch()
+            ));
         } else {
             return ResponseEntity.badRequest().body("Invalid credentials");
         }

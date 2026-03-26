@@ -15,11 +15,11 @@ RUN mvn -B -DskipTests package
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
-# ✅ Correct jar copy (FIXED)
+# Copy the fat jar from the build stage
 COPY --from=build /app/target/*.jar app.jar
 
 # Expose port
-EXPOSE 8080
+EXPOSE 10000
 
 # Run application
 ENTRYPOINT ["java", "-jar", "app.jar"]

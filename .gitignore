@@ -34,3 +34,7 @@ build/
 
 ### Environment (do not commit API keys) ###
 .env
+
+### Local-only artifacts ###
+.m2/
+system/

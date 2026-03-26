@@ -1,5 +1,7 @@
 package com.example.system.controller;
 
+import com.example.system.dto.ProfileResponse;
+import com.example.system.dto.ProfileUpdateRequest;
 import com.example.system.model.User;
 import com.example.system.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +12,7 @@ import com.example.system.repository.UserRepository;
 
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 public class UserController {
 
     @Autowired
@@ -25,16 +27,33 @@ public class UserController {
     }
 
     @GetMapping("/profile")
-    public ResponseEntity<User> getProfile(Authentication authentication) {
+    public ResponseEntity<ProfileResponse> getProfile(Authentication authentication) {
         return userService.getUserByEmail(authentication.getName())
-                .map(ResponseEntity::ok)
+                .map(user -> ResponseEntity.ok(new ProfileResponse(
+                        user.getId(),
+                        user.getName(),
+                        user.getEmail(),
+                        user.getRole(),
+                        user.getDepartment(),
+                        user.getBranch()
+                )))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/profile")
-    public ResponseEntity<User> updateProfile(Authentication authentication, @RequestBody User updatedUser) {
+    public ResponseEntity<ProfileResponse> updateProfile(Authentication authentication, @RequestBody ProfileUpdateRequest updatedUser) {
         return userService.getUserByEmail(authentication.getName())
-                .map(existingUser -> ResponseEntity.ok(userService.updateUser(existingUser, updatedUser)))
+                .map(existingUser -> {
+                    User savedUser = userService.updateUser(existingUser, updatedUser);
+                    return ResponseEntity.ok(new ProfileResponse(
+                            savedUser.getId(),
+                            savedUser.getName(),
+                            savedUser.getEmail(),
+                            savedUser.getRole(),
+                            savedUser.getDepartment(),
+                            savedUser.getBranch()
+                    ));
+                })
                 .orElse(ResponseEntity.notFound().build());
     }
 }
